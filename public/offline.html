@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image Email Sender</title>
+
+    <link rel="manifest" href="/static/manifest.json" />
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+      body {
+        font-family: Verdana, Geneva, sans-serif;
+        background-color: #f4f4f4;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0;
+        padding: 20px;
+        min-height: 100vh;
+      }
+
+      h1 {
+        text-align: center;
+        color: #333;
+        margin-top: 20px;
+      }
+
+      #uploadForm {
+        display: none;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 500px;
+        margin-top: 20px;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      label {
+        font-size: 14px;
+        color: #333;
+      }
+
+      input[type="email"],
+      input[type="file"],
+      input[type="text"] {
+        padding: 10px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        width: 100%;
+      }
+
+      input[type="file"] {
+        border: none;
+      }
+
+      button {
+        padding: 12px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      button:hover {
+        background-color: #45a049;
+      }
+
+      #status {
+        margin-top: 10px;
+        font-size: 14px;
+        color: #333;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>DOHS App</h1>
+    <div
+      id="g_id_onload"
+      data-client_id="195713014656-5uprqg27vp5hmka2v3shht00ver91tb1.apps.googleusercontent.com"
+      data-callback="onSignIn"
+    ></div>
+
+    <div id="uploadForm">
+      <h2>Send Images via Email</h2>
+      <form id="imageForm" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="senderEmail">Sender Email:</label>
+          <input
+            type="email"
+            id="senderEmail"
+            name="senderEmail"
+            readonly
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="receiverEmail">Receiver Email:</label>
+          <input
+            type="email"
+            id="receiverEmail"
+            name="receiverEmail"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="image1">Image 1:</label>
+          <input type="file" id="image1" name="image1" required />
+        </div>
+
+        <div class="form-group">
+          <label for="description1">Description 1:</label>
+          <input type="text" id="description1" name="description1" required />
+        </div>
+
+        <div class="form-group">
+          <label for="image2">Image 2:</label>
+          <input type="file" id="image2" name="image2" required />
+        </div>
+
+        <div class="form-group">
+          <label for="description2">Description 2:</label>
+          <input type="text" id="description2" name="description2" required />
+        </div>
+
+        <button type="submit">Send Email</button>
+      </form>
+      <p id="status">Sending...</p>
+    </div>
+
+    <script>
+      function onSignIn(response) {
+        const { credential } = response;
+        const payload = JSON.parse(atob(credential.split(".")[1]));
+        const email = payload.email;
+
+        document.getElementById("senderEmail").value = email;
+        document.getElementById("uploadForm").style.display = "block";
+      }
+
+      document
+        .getElementById("imageForm")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+
+          const statusText = document.getElementById("status");
+          statusText.style.display = "block"; // Show "Sending..." text
+
+          const formData = new FormData(this);
+
+          try {
+            const response = await fetch("/send-email", {
+              method: "POST",
+              body: formData,
+            });
+
+            statusText.style.display = "none"; // Hide "Sending..." text
+            alert(await response.text()); // Show success or failure alert
+          } catch (error) {
+            statusText.style.display = "none";
+            alert("Error sending email.");
+          }
+        });
+    </script>
+  </body>
+</html>
