@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const nodemailer = require("nodemailer");
 const multer = require("multer");
@@ -18,6 +20,12 @@ app.use((req, res, next) => {
 // Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, "public")));
 
+// test
+// Add this route in your server setup
+app.get("/api/client-id", (req, res) => {
+  res.json({ clientId: process.env.GOOGLE_CLIENT_ID });
+});
+
 // Route to serve the index.html file
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html")); // Ensure the path matches your file location
@@ -27,12 +35,11 @@ app.get("/", (req, res) => {
 const upload = multer({ dest: "uploads/" });
 
 // OAuth2 setup for Google
-const CLIENT_ID =
-  "195713014656-5uprqg27vp5hmka2v3shht00ver91tb1.apps.googleusercontent.com";
-const CLIENT_SECRET = "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";
-const REDIRECT_URI = "https://developers.google.com/oauthplayground";
-const REFRESH_TOKEN =
-  "1//04q4WDD028kNMCgYIARAAGAQSNwF-L9IrWY689NTL4yLmeR0fJTmriADCchcTSqJxIxFvqfdfmm_py-dpYhcodfrD0WMifmNJWbg"; // Get this from OAuth playground or your app
+const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+const REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN;
+const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI;
+const PASS = process.env.PASS;
 
 const oAuth2Client = new google.auth.OAuth2(
   CLIENT_ID,
@@ -55,7 +62,7 @@ async function sendMail(
       service: "gmail",
       auth: {
         user: senderEmail, // Your Gmail address
-        pass: "uznf ikyj qkxh ikxp", // App-generated password
+        pass: PASS, // App-generated password
       },
     });
 

@@ -86,12 +86,29 @@
     </style>
   </head>
   <body>
-    <h1>DOHS App</h1>
+    <!-- <h1>DOHS App</h1>
     <div
       id="g_id_onload"
       data-client_id="195713014656-5uprqg27vp5hmka2v3shht00ver91tb1.apps.googleusercontent.com"
       data-callback="onSignIn"
-    ></div>
+    ></div> -->
+
+    <h1>DOHS App</h1>
+    <div id="g_id_onload" data-callback="onSignIn"></div>
+
+    <script>
+      // Fetch the client ID from the server
+      fetch("/api/client-id")
+        .then((response) => response.json())
+        .then((data) => {
+          document
+            .getElementById("g_id_onload")
+            .setAttribute("data-client_id", data.clientId);
+        })
+        .catch((error) => console.error("Error fetching client ID:", error));
+    </script>
+
+    <!-- ///////////////// -->
 
     <div id="uploadForm">
       <h2>Send Images via Email</h2>
